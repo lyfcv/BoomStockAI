@@ -1,0 +1,75 @@
+# BoomStockAI - Python 3.11兼容版本
+# ========================================
+
+# 核心依赖
+streamlit>=1.40.0
+pandas>=2.0.0
+numpy>=1.24.0
+psycopg2-binary>=2.9.0
+sqlalchemy>=2.0.0
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+loguru>=0.7.0
+
+# 数据获取
+baostock>=0.8.8
+akshare>=1.16.90
+# tushare>=1.4.1  # 已改用免费爬虫方案
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# 数据分析和可视化  
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+yfinance>=0.2.0
+
+# 工具库
+tqdm>=4.65.0
+schedule>=1.2.0
+
+# 技术分析和数学计算
+scipy>=1.11.0
+statsmodels>=0.14.0
+
+# 新闻情感分析
+jieba>=0.42.0
+textblob>=0.17.0
+
+# Web界面相关(Streamlit会自动安装这些)
+# pillow - 由streamlit自动安装
+# tornado - 由streamlit自动安装
+# altair - 由streamlit自动安装
+
+# 可选依赖 - 按需安装
+# ========================================
+# 以下包可能需要额外的系统依赖，建议按需安装：
+
+# AI和机器学习 (可选)
+# openai>=1.0.0
+# scikit-learn>=1.3.0
+# transformers>=4.30.0
+# torch>=2.0.0
+
+# 技术分析 (可选 - 需要编译)
+# ta-lib>=0.4.25
+
+# 高级爬虫 (可选)
+# selenium>=4.15.0
+# scrapy>=2.10.0
+
+# 量化回测 (可选)  
+# backtrader>=1.9.76
+# empyrical>=0.5.0
+
+# 缓存系统 (可选)
+# redis>=5.0.0
+
+# 测试工具 (开发用)
+# pytest>=7.4.0
+# pytest-cov>=4.1.0
+
+# 代码格式化 (开发用)
+# black>=23.0.0
+# flake8>=6.0.0 

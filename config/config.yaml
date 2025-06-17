@@ -1,0 +1,159 @@
+# BoomStockAI 系统配置文件
+# ========================================
+
+# 数据库配置
+database:
+  host: localhost
+  port: 5432
+  name: boomstock_ai
+  user: postgres
+  password: "${POSTGRES_PASSWORD}"
+  pool_size: 20
+  max_overflow: 40
+  echo: false
+
+# 数据源配置
+data_sources:
+  baostock:
+    enabled: true
+    retry_times: 3
+    timeout: 30
+  
+  akshare:
+    enabled: true
+    retry_times: 3
+    timeout: 30
+  
+  yfinance:
+    enabled: false
+    retry_times: 3
+    timeout: 30
+
+# 爬虫配置
+crawler:
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  request_delay: 1.0
+  max_retries: 3
+  timeout: 30
+  
+  # 新闻源配置
+  news_sources:
+    - name: "东方财富"
+      url: "https://finance.eastmoney.com/"
+      enabled: true
+    - name: "新浪财经"
+      url: "https://finance.sina.com.cn/"
+      enabled: true
+    - name: "腾讯财经"
+      url: "https://finance.qq.com/"
+      enabled: true
+
+# AI模型配置
+ai_config:
+  openai:
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-4"
+    max_tokens: 4096
+    temperature: 0.1
+  
+  # 本地模型配置
+  local_models:
+    sentiment_model: "models/sentiment_model"
+    stock_analysis_model: "models/stock_analysis_model"
+
+# 策略配置
+strategies:
+  # 技术指标策略
+  technical:
+    enabled: true
+    indicators:
+      - "RSI"
+      - "MACD" 
+      - "MA"
+      - "BOLL"
+      - "KDJ"
+  
+  # 基本面策略
+  fundamental:
+    enabled: true
+    factors:
+      - "PE"
+      - "PB"
+      - "ROE"
+      - "营收增长率"
+      - "净利润增长率"
+  
+  # 情感分析策略
+  sentiment:
+    enabled: true
+    weight: 0.3
+
+# 回测配置
+backtest:
+  start_date: "2020-01-01"
+  end_date: null  # null表示使用当前日期
+  initial_capital: 1000000  # 初始资金100万
+  commission: 0.0003  # 手续费率
+  slippage: 0.001  # 滑点
+
+# 数据更新配置
+data_update:
+  # 股价数据更新频率（分钟）
+  price_update_frequency: 30
+  # 基本面数据更新频率（小时）
+  fundamental_update_frequency: 24
+  # 新闻数据更新频率（分钟）
+  news_update_frequency: 15
+
+# 日志配置
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_path: "logs/boomstock_ai.log"
+  max_file_size: "10MB"
+  backup_count: 5
+
+# Redis配置（缓存）
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+  password: "${REDIS_PASSWORD}"
+  
+# Streamlit配置
+streamlit:
+  port: 8501
+  title: "BoomStockAI - 智能选股系统"
+  theme:
+    primaryColor: "#FF6B6B"
+    backgroundColor: "#FFFFFF"
+    secondaryBackgroundColor: "#F0F2F6"
+    textColor: "#262730"
+
+# 股票池配置
+stock_pool:
+  # 默认关注的指数
+  indices:
+    - "000001.SH"  # 上证指数
+    - "399001.SZ"  # 深证成指
+    - "399006.SZ"  # 创业板指
+  
+  # 行业分类
+  industries:
+    - "电子"
+    - "计算机"
+    - "医药生物"
+    - "新能源"
+    - "人工智能"
+  
+  # 市值范围
+  market_cap:
+    min: 1000000000  # 10亿
+    max: 500000000000  # 5000亿
+
+# 风险控制
+risk_control:
+  max_position_size: 0.1  # 单只股票最大仓位10%
+  max_drawdown: 0.15  # 最大回撤15%
+  stop_loss: 0.08  # 止损8%
+  take_profit: 0.20  # 止盈20% 

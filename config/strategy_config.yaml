@@ -1,0 +1,101 @@
+# BoomStockAI 策略配置文件
+
+strategies:
+  # 平台突破策略配置
+  platform_breakout:
+    enabled: true
+    description: "基于平台整理后的放量突破形态进行选股"
+    
+    # 定时执行配置
+    schedule:
+      enabled: true
+      daily: "09:30"  # 每日9:30执行
+      # weekly:
+      #   day: "monday"
+      #   time: "09:30"
+    
+    # 策略参数
+    config:
+      # 平台检测参数
+      platform_window: 20          # 平台检测窗口期（天）
+      max_volatility: 0.15         # 最大波动率（15%）
+      min_platform_days: 15        # 最小平台天数
+      
+      # 突破信号参数
+      volume_threshold: 2.0        # 成交量放大倍数
+      price_threshold: 0.03        # 价格涨幅阈值（3%）
+      
+      # 数据获取参数
+      lookback_days: 60            # 数据回看天数
+      
+      # 基础过滤条件
+      min_price: 5.0               # 最低股价
+      max_price: 200.0             # 最高股价
+      min_market_cap: 50           # 最小市值（亿元）
+      exclude_st: true             # 排除ST股票
+      min_volume: 10000000         # 最小成交量（元）
+      
+      # 技术指标过滤
+      rsi_range: [30, 80]          # RSI范围
+      
+      # 评分阈值
+      score_threshold: 60          # 最低评分阈值
+
+# 执行配置
+execution:
+  max_concurrent: 3              # 最大并发数
+  timeout: 3600                  # 超时时间（秒）
+  retry_times: 2                 # 重试次数
+  save_results: true             # 是否保存结果到数据库
+
+# 通知配置
+notification:
+  enabled: false                 # 是否启用通知
+  
+  # Webhook通知（如钉钉、企业微信等）
+  webhook_url: ""
+  
+  # 邮件通知
+  email:
+    enabled: false
+    smtp_server: "smtp.qq.com"
+    port: 587
+    username: ""
+    password: ""
+    recipients: []
+
+# 风险控制配置
+risk_control:
+  max_position_size: 0.1         # 最大仓位比例
+  stop_loss: 0.08                # 止损比例
+  take_profit: 0.20              # 止盈比例
+  max_daily_trades: 10           # 每日最大交易数
+
+# 回测配置
+backtest:
+  initial_capital: 1000000       # 初始资金
+  commission: 0.0003             # 手续费率
+  slippage: 0.001                # 滑点
+  benchmark: "sh.000001"         # 基准指数
+
+# 数据源配置
+data_sources:
+  baostock:
+    enabled: true
+    retry_times: 3
+    timeout: 30
+  
+  akshare:
+    enabled: false
+    timeout: 30
+  
+  tushare:
+    enabled: false
+    token: ""
+
+# 日志配置
+logging:
+  level: "INFO"
+  file_rotation: "10 MB"
+  file_retention: "30 days"
+  format: "{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{function}:{line} - {message}" 

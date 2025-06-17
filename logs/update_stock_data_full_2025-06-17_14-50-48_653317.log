@@ -1,0 +1,12 @@
+2025-06-17 14:50:48.658 | INFO     | __main__:<module>:107 - 执行全量数据更新...
+2025-06-17 14:50:48.680 | INFO     | data_collection.market_data.baostock_api:_login:43 - BaoStock登录成功
+2025-06-17 14:50:48.680 | INFO     | __main__:update_stock_basic_info:23 - 开始更新股票基本信息...
+2025-06-17 14:50:48.680 | INFO     | data_collection.market_data.baostock_api:get_stock_basic_info:79 - 开始获取股票基本信息，日期: 最新交易日
+2025-06-17 14:50:48.687 | INFO     | data_collection.market_data.baostock_api:get_stock_basic_info:96 - 获取股票基本信息成功，共0只股票
+2025-06-17 14:50:48.688 | WARNING  | __main__:update_stock_basic_info:29 - 未能获取到股票基本信息，请检查网络或BaoStock API状态
+2025-06-17 14:50:48.696 | INFO     | data_collection.market_data.baostock_api:logout:56 - BaoStock登出成功
+2025-06-17 14:50:48.718 | INFO     | data_collection.market_data.baostock_api:_login:43 - BaoStock登录成功
+2025-06-17 14:50:48.718 | INFO     | __main__:update_stock_history_data:59 - 开始全量更新所有股票的历史K线数据，起始日期: 2015-01-01...
+2025-06-17 14:50:48.749 | WARNING  | __main__:update_stock_history_data:67 - 数据库中没有股票信息，请先运行 update_stock_basic_info()
+2025-06-17 14:50:48.755 | INFO     | data_collection.market_data.baostock_api:logout:56 - BaoStock登出成功
+2025-06-17 14:50:48.755 | INFO     | __main__:<module>:112 - 全量数据更新完成.
