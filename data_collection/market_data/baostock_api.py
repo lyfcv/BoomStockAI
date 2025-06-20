@@ -143,26 +143,35 @@ class BaoStockAPI:
                 adjustflag=adjustflag
             )
             
+            if rs.error_code != '0':
+                logger.error(f"查询历史数据失败: {rs.error_msg}")
+                return []
+            
             data_list = []
             while (rs.error_code == '0') & rs.next():
                 row = rs.get_row_data()
                 if row[0] and row[0] != '':  # 确保日期不为空
                     try:
+                        # 根据官方文档，字段顺序为：
+                        # date,code,open,high,low,close,preclose,volume,amount,adjustflag,turn,tradestatus,pctChg,peTTM,pbMRQ,psTTM,pcfNcfTTM,isST
                         data_dict = {
-                            'trade_date': datetime.strptime(row[0], '%Y-%m-%d'),
-                            'code': row[1],
-                            'open_price': float(row[2]) if row[2] else None,
-                            'high_price': float(row[3]) if row[3] else None,
-                            'low_price': float(row[4]) if row[4] else None,
-                            'close_price': float(row[5]) if row[5] else None,
-                            'preclose_price': float(row[6]) if row[6] else None,
-                            'volume': int(row[7]) if row[7] else None,
-                            'amount': float(row[8]) if row[8] else None,
-                            'turnover_rate': float(row[10]) if row[10] else None,
-                            'pct_chg': float(row[12]) if row[12] else None,
-                            'pe_ratio': float(row[13]) if row[13] else None,
-                            'pb_ratio': float(row[14]) if row[14] else None,
-                            'is_st': row[17] == '1' if row[17] else False
+                            'trade_date': datetime.strptime(row[0], '%Y-%m-%d'),  # 0: date
+                            'code': row[1],  # 1: code
+                            'open_price': float(row[2]) if row[2] and row[2] != '' else None,  # 2: open
+                            'high_price': float(row[3]) if row[3] and row[3] != '' else None,  # 3: high
+                            'low_price': float(row[4]) if row[4] and row[4] != '' else None,  # 4: low
+                            'close_price': float(row[5]) if row[5] and row[5] != '' else None,  # 5: close
+                            'preclose_price': float(row[6]) if row[6] and row[6] != '' else None,  # 6: preclose
+                            'volume': int(float(row[7])) if row[7] and row[7] != '' else None,  # 7: volume
+                            'amount': float(row[8]) if row[8] and row[8] != '' else None,  # 8: amount
+                            'turnover_rate': float(row[10]) if row[10] and row[10] != '' else None,  # 10: turn
+                            'trade_status': int(row[11]) if row[11] and row[11] != '' else None,  # 11: tradestatus
+                            'pct_chg': float(row[12]) if row[12] and row[12] != '' else None,  # 12: pctChg
+                            'pe_ratio': float(row[13]) if row[13] and row[13] != '' else None,  # 13: peTTM
+                            'pb_ratio': float(row[14]) if row[14] and row[14] != '' else None,  # 14: pbMRQ
+                            'ps_ratio': float(row[15]) if row[15] and row[15] != '' else None,  # 15: psTTM
+                            'pcf_ratio': float(row[16]) if row[16] and row[16] != '' else None,  # 16: pcfNcfTTM
+                            'is_st': row[17] == '1' if len(row) > 17 and row[17] else False  # 17: isST
                         }
                         data_list.append(data_dict)
                     except (ValueError, IndexError) as e:
@@ -341,6 +350,8 @@ class BaoStockAPI:
                         existing_record.turnover_rate = data['turnover_rate']
                         existing_record.pe_ratio = data['pe_ratio']
                         existing_record.pb_ratio = data['pb_ratio']
+                        # 注意：其他字段如preclose_price, trade_status, pct_chg, ps_ratio, pcf_ratio, is_st
+                        # 在当前数据库模型中不存在，如果需要可以后续添加到数据库模型中
                     else:
                         # 创建新记录
                         new_record = StockPrice(
@@ -459,22 +470,27 @@ class BaoStockAPI:
                 adjustflag="3"
             )
             
+            if rs.error_code != '0':
+                logger.error(f"查询指数数据失败: {rs.error_msg}")
+                return []
+            
             data_list = []
             while (rs.error_code == '0') & rs.next():
                 row = rs.get_row_data()
                 if row[0] and row[0] != '':
                     try:
+                        # 指数数据字段顺序：date,code,open,high,low,close,preclose,volume,amount,pctChg
                         data_dict = {
-                            'trade_date': datetime.strptime(row[0], '%Y-%m-%d'),
-                            'code': row[1],
-                            'open_price': float(row[2]) if row[2] else None,
-                            'high_price': float(row[3]) if row[3] else None,
-                            'low_price': float(row[4]) if row[4] else None,
-                            'close_price': float(row[5]) if row[5] else None,
-                            'preclose_price': float(row[6]) if row[6] else None,
-                            'volume': int(float(row[7])) if row[7] else None,
-                            'amount': float(row[8]) if row[8] else None,
-                            'pct_chg': float(row[9]) if row[9] else None
+                            'trade_date': datetime.strptime(row[0], '%Y-%m-%d'),  # 0: date
+                            'code': row[1],  # 1: code
+                            'open_price': float(row[2]) if row[2] and row[2] != '' else None,  # 2: open
+                            'high_price': float(row[3]) if row[3] and row[3] != '' else None,  # 3: high
+                            'low_price': float(row[4]) if row[4] and row[4] != '' else None,  # 4: low
+                            'close_price': float(row[5]) if row[5] and row[5] != '' else None,  # 5: close
+                            'preclose_price': float(row[6]) if row[6] and row[6] != '' else None,  # 6: preclose
+                            'volume': int(float(row[7])) if row[7] and row[7] != '' and row[7] != '0' else None,  # 7: volume
+                            'amount': float(row[8]) if row[8] and row[8] != '' else None,  # 8: amount
+                            'pct_chg': float(row[9]) if row[9] and row[9] != '' else None  # 9: pctChg
                         }
                         data_list.append(data_dict)
                     except (ValueError, IndexError) as e:
@@ -647,3 +663,47 @@ class BaoStockAPI:
 
 # 创建全局实例
 baostock_api = BaoStockAPI()
+
+def test_baostock_api():
+    """
+    测试BaoStock API功能
+    """
+    try:
+        # 测试获取股票历史数据
+        print("测试获取股票历史数据...")
+        test_code = "sh.600000"  # 浦发银行
+        end_date = datetime.now().strftime('%Y-%m-%d')
+        start_date = (datetime.now() - timedelta(days=5)).strftime('%Y-%m-%d')
+        
+        stock_data = baostock_api.get_stock_history_data(test_code, start_date, end_date)
+        if stock_data:
+            print(f"✓ 成功获取股票数据: {len(stock_data)} 条记录")
+            print(f"  示例数据: {stock_data[0] if stock_data else 'None'}")
+        else:
+            print("✗ 获取股票数据失败")
+        
+        # 测试获取指数数据
+        print("\n测试获取指数数据...")
+        index_data = baostock_api.get_index_data("sh.000001", start_date, end_date)
+        if index_data:
+            print(f"✓ 成功获取指数数据: {len(index_data)} 条记录")
+            print(f"  示例数据: {index_data[0] if index_data else 'None'}")
+        else:
+            print("✗ 获取指数数据失败")
+        
+        # 测试获取股票基本信息
+        print("\n测试获取股票基本信息...")
+        basic_info = baostock_api.get_stock_basic_info()
+        if basic_info:
+            print(f"✓ 成功获取股票基本信息: {len(basic_info)} 只股票")
+            print(f"  示例数据: {basic_info[0] if basic_info else 'None'}")
+        else:
+            print("✗ 获取股票基本信息失败")
+            
+    except Exception as e:
+        print(f"测试过程中出现错误: {e}")
+    finally:
+        baostock_api.logout()
+
+if __name__ == "__main__":
+    test_baostock_api()

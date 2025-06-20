@@ -19,6 +19,7 @@ from frontend.dashboard import show_dashboard
 from frontend.stock_detail import show_stock_detail
 from frontend.backtest_view import show_backtest_results
 from frontend.ths_hot_list_view import show_ths_hot_list_page
+from frontend.stock_ai_agent import main as show_ai_agent_page
 
 # 页面配置
 st.set_page_config(
@@ -112,6 +113,7 @@ def show_sidebar():
     # 导航菜单
     pages = {
         "📊 市场概览": "dashboard",
+        "🤖 AI分析师": "ai_agent",
         "🔥 同花顺热榜": "ths_hot_list",
         "🔍 个股分析": "stock_detail", 
         "📈 回测结果": "backtest",
@@ -305,6 +307,8 @@ def main():
     try:
         if selected_page == "dashboard":
             show_dashboard()
+        elif selected_page == "ai_agent":
+            show_ai_agent_page()
         elif selected_page == "stock_detail":
             show_stock_detail()
         elif selected_page == "backtest":
