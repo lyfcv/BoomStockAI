@@ -1,0 +1,150 @@
+# BoomStockAI 内存优化配置
+# ========================================
+
+# 系统内存配置
+system:
+  # 内存使用阈值（百分比）
+  memory_threshold:
+    warning: 80
+    critical: 90
+    emergency: 95
+  
+  # Swap配置
+  swap:
+    enabled: true
+    size: "2G"
+    swappiness: 10
+    cache_pressure: 50
+
+# 数据库内存优化
+database:
+  mysql:
+    # 限制MySQL最大内存使用
+    max_memory: "512M"
+    innodb_buffer_pool_size: "256M"
+    key_buffer_size: "32M"
+    query_cache_size: "16M"
+    max_connections: 50
+    
+  postgresql:
+    # PostgreSQL内存配置
+    shared_buffers: "128MB"
+    effective_cache_size: "512MB"
+    work_mem: "4MB"
+    maintenance_work_mem: "64MB"
+    max_connections: 50
+
+# Python应用内存配置
+python:
+  # 环境变量设置
+  environment:
+    PYTHONUNBUFFERED: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    MALLOC_ARENA_MAX: "2"
+    PYTHONHASHSEED: "0"
+  
+  # 进程内存限制
+  process_limits:
+    max_memory_per_process: "256M"
+    max_processes: 4
+  
+  # 垃圾回收优化
+  gc_optimization:
+    enabled: true
+    threshold0: 700
+    threshold1: 10
+    threshold2: 10
+
+# Web服务配置
+web_services:
+  streamlit:
+    # Streamlit内存配置
+    max_memory: "256M"
+    server_max_upload_size: 50
+    server_max_message_size: 50
+    
+  uvicorn:
+    # Uvicorn配置
+    workers: 1
+    max_requests: 1000
+    max_requests_jitter: 100
+    timeout_keep_alive: 2
+
+# 数据处理配置
+data_processing:
+  # 批处理大小限制
+  batch_sizes:
+    stock_data: 1000
+    news_data: 500
+    analysis: 100
+  
+  # 缓存配置
+  cache:
+    max_size: "64M"
+    ttl: 3600  # 1小时
+    
+  # 并发限制
+  concurrency:
+    max_workers: 2
+    max_connections: 10
+
+# 监控配置
+monitoring:
+  # 内存监控间隔（秒）
+  check_interval: 300  # 5分钟
+  
+  # 日志配置
+  logging:
+    level: "INFO"
+    max_file_size: "10MB"
+    backup_count: 3
+    
+  # 告警配置
+  alerts:
+    enabled: true
+    memory_threshold: 85
+    disk_threshold: 90
+
+# 自动清理配置
+auto_cleanup:
+  enabled: true
+  
+  # 清理策略
+  strategies:
+    - name: "system_cache"
+      enabled: true
+      interval: 3600  # 1小时
+      
+    - name: "log_rotation"
+      enabled: true
+      interval: 86400  # 24小时
+      max_age: 7  # 7天
+      
+    - name: "temp_files"
+      enabled: true
+      interval: 21600  # 6小时
+      max_age: 1  # 1天
+      
+    - name: "process_restart"
+      enabled: true
+      memory_threshold: 90
+      processes: ["streamlit", "python"]
+
+# 应急处理配置
+emergency:
+  # 应急处理触发条件
+  triggers:
+    memory_usage: 95
+    available_memory: "100M"
+    
+  # 应急处理动作
+  actions:
+    - "clear_cache"
+    - "restart_non_critical_services"
+    - "force_garbage_collection"
+    
+  # 保护的关键服务
+  protected_services:
+    - "mysql"
+    - "postgresql"
+    - "sshd" 
