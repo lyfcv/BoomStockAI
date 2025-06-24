@@ -7,9 +7,10 @@ import pandas as pd
 
 def main():
     """获取K线数据并计算MACD、布林带和均线指标"""
-    stock_code = 'sz.002173'
+    # 支持多种输入格式，现在get_k_data已经支持自动识别
+    stock_code = '300739'  # 可以直接输入6位代码，get_k_data会自动识别
     
-    # 1. 获取日线数据（获取更多数据以确保60日均线的准确性）
+    # 1. 获取日线数据（get_k_data已经支持自动识别股票代码）
     print("\n1. 获取日线数据（包含估值指标）:")
     daily_data = get_k_data(stock_code, 150, "d", include_valuation=True)  # 增加到150天
     
@@ -57,10 +58,14 @@ def main():
         print(f"\n7. 关键指标数据（最近10条）:")
         print(combined_data[available_columns].tail(10).to_string(index=False))
         
-        # 8. 保存到CSV文件
-        output_file = f"{stock_code}_with_all_indicators.csv"
-        combined_data.to_csv(output_file, index=False, encoding='utf-8-sig')
-        print(f"\n8. 数据已保存到: {output_file}")
+        # 8. 保存到CSV文件（按日期降序排列）
+        # 从combined_data中获取实际的股票代码
+        actual_stock_code = combined_data['code'].iloc[0].replace('.', '_')
+        output_file = f"{actual_stock_code}_with_all_indicators.csv"
+        # 按日期降序排列后保存
+        combined_data_sorted = combined_data.sort_values('date', ascending=False)
+        combined_data_sorted.to_csv(output_file, index=False, encoding='utf-8-sig')
+        print(f"\n8. 数据已保存到: {output_file} (按日期降序排列)")
         
         # 9. 显示统计信息
         print(f"\n9. 数据统计信息:")
@@ -115,5 +120,31 @@ def main():
         return None
 
 
+def test_multiple_stocks():
+    """测试多个股票的技术指标计算"""
+    test_stocks = ['600000', '000001', '300787', '688001']
+    
+    print("=== 测试多个股票的技术指标计算 ===")
+    for stock in test_stocks:
+        print(f"\n{'='*50}")
+        print(f"正在处理股票: {stock}")
+        print(f"{'='*50}")
+        
+        # 临时修改stock_code进行测试
+        global stock_code
+        original_code = '300787'  # 保存原值
+        
+        # 这里可以调用main函数的逻辑，但为了简化，只获取数据
+        data = get_k_data(stock, 10, "d", include_valuation=True)
+        if data is not None:
+            print(f"✅ 成功获取 {stock} 的数据，共 {len(data)} 条记录")
+        else:
+            print(f"❌ 获取 {stock} 的数据失败")
+
+
 if __name__ == "__main__":
+    # 运行主程序
     result = main()
+    
+    # 可选：测试多个股票
+    # test_multiple_stocks()

@@ -27,6 +27,10 @@ def calculate_ma(data: pd.DataFrame, price_column: str = 'close', periods: Union
     if result[price_column].dtype == 'object':
         result[price_column] = pd.to_numeric(result[price_column], errors='coerce')
     
+    # 确保数据按日期升序排序（最早的在前面）
+    if 'date' in result.columns:
+        result = result.sort_values('date').reset_index(drop=True)
+    
     # 处理单个周期的情况
     if isinstance(periods, int):
         periods = [periods]
@@ -57,6 +61,10 @@ def calculate_ema(data: pd.DataFrame, price_column: str = 'close', periods: Unio
     if result[price_column].dtype == 'object':
         result[price_column] = pd.to_numeric(result[price_column], errors='coerce')
     
+    # 确保数据按日期升序排序（最早的在前面）
+    if 'date' in result.columns:
+        result = result.sort_values('date').reset_index(drop=True)
+    
     # 处理单个周期的情况
     if isinstance(periods, int):
         periods = [periods]
@@ -85,6 +93,10 @@ def calculate_multi_ma(data: pd.DataFrame, price_column: str = 'close') -> pd.Da
     # 确保价格列为数值类型
     if result[price_column].dtype == 'object':
         result[price_column] = pd.to_numeric(result[price_column], errors='coerce')
+    
+    # 确保数据按日期升序排序（最早的在前面）
+    if 'date' in result.columns:
+        result = result.sort_values('date').reset_index(drop=True)
     
     # 常用的移动平均线周期
     periods = [5, 10, 20, 30, 60, 120, 250]

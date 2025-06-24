@@ -32,6 +32,10 @@ def calculate_macd(data: pd.DataFrame, price_column: str = 'close',
     if result[price_column].dtype == 'object':
         result[price_column] = pd.to_numeric(result[price_column], errors='coerce')
     
+    # 确保数据按日期升序排序（最早的在前面）
+    if 'date' in result.columns:
+        result = result.sort_values('date').reset_index(drop=True)
+    
     # 计算快线和慢线EMA
     ema_fast = result[price_column].ewm(span=fast_period, adjust=False).mean()
     ema_slow = result[price_column].ewm(span=slow_period, adjust=False).mean()

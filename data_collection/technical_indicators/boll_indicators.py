@@ -31,6 +31,10 @@ def calculate_boll(data: pd.DataFrame, price_column: str = 'close', period: int 
     if result[price_column].dtype == 'object':
         result[price_column] = pd.to_numeric(result[price_column], errors='coerce')
     
+    # 确保数据按日期升序排序（最早的在前面）
+    if 'date' in result.columns:
+        result = result.sort_values('date').reset_index(drop=True)
+    
     # 计算中轨（移动平均线）
     result['BOLL_MID'] = result[price_column].rolling(window=period, min_periods=1).mean()
     

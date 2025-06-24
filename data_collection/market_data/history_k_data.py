@@ -4,12 +4,105 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 
+def format_stock_code(code: str) -> str:
+    """
+    自动格式化股票代码，添加正确的市场前缀
+    
+    Args:
+        code (str): 原始股票代码（如 '600000', '000001', '300787'）
+    
+    Returns:
+        str: 格式化后的股票代码（如 'sh.600000', 'sz.000001', 'sz.300787'）
+    """
+    # 如果已经有前缀，直接返回
+    if '.' in code and len(code) > 6:
+        return code
+    
+    # 去除可能存在的前缀和空格
+    clean_code = code.replace('sh.', '').replace('sz.', '').replace('bj.', '').strip()
+    
+    # 确保是6位数字
+    if not clean_code.isdigit() or len(clean_code) != 6:
+        raise ValueError(f"无效的股票代码: {code}，股票代码应为6位数字")
+    
+    # 根据代码规则判断市场
+    if clean_code.startswith('6'):
+        # 6开头：上海主板
+        return f'sh.{clean_code}'
+    elif clean_code.startswith('0'):
+        # 0开头：深圳主板
+        return f'sz.{clean_code}'
+    elif clean_code.startswith('3'):
+        # 3开头：创业板
+        return f'sz.{clean_code}'
+    elif clean_code.startswith('688'):
+        # 688开头：科创板
+        return f'sh.{clean_code}'
+    elif clean_code.startswith('8'):
+        # 8开头：北交所
+        return f'bj.{clean_code}'
+    else:
+        # 其他情况默认深圳
+        return f'sz.{clean_code}'
+
+
+def get_stock_info(code: str) -> dict:
+    """
+    根据股票代码获取股票信息
+    
+    Args:
+        code (str): 股票代码
+    
+    Returns:
+        dict: 包含股票信息的字典
+    """
+    clean_code = code.replace('sh.', '').replace('sz.', '').replace('bj.', '').strip()
+    
+    if clean_code.startswith('6'):
+        return {
+            'market': '上海主板',
+            'market_code': 'SH',
+            'description': '上海证券交易所主板'
+        }
+    elif clean_code.startswith('0'):
+        return {
+            'market': '深圳主板',
+            'market_code': 'SZ',
+            'description': '深圳证券交易所主板'
+        }
+    elif clean_code.startswith('3'):
+        return {
+            'market': '创业板',
+            'market_code': 'SZ',
+            'description': '深圳证券交易所创业板'
+        }
+    elif clean_code.startswith('688'):
+        return {
+            'market': '科创板',
+            'market_code': 'SH',
+            'description': '上海证券交易所科创板'
+        }
+    elif clean_code.startswith('8'):
+        return {
+            'market': '北交所',
+            'market_code': 'BJ',
+            'description': '北京证券交易所'
+        }
+    else:
+        return {
+            'market': '未知',
+            'market_code': 'UNKNOWN',
+            'description': '未知市场'
+        }
+
+
 def get_k_data(stock_code: str, count: int, frequency: str = "d", include_valuation: bool = True) -> Optional[pd.DataFrame]:
     """
     获取股票的K线数据（支持多种频率，保持原始输出格式）
+    支持自动识别股票代码市场前缀
     
     Args:
-        stock_code (str): 股票代码，格式如 'sh.600000' 或 'sz.000001'
+        stock_code (str): 股票代码，支持带前缀（'sh.600000'）或不带前缀（'600000'）
         count (int): 需要获取的K线数据条数
         frequency (str): 数据频率类型
             - "d": 日K线（默认）
@@ -57,6 +150,21 @@ def get_k_data(stock_code: str, count: int, frequency: str = "d", include_valuat
         - turn: 换手率
         - pctChg: 涨跌幅
     """
+    
+    # 自动格式化股票代码
+    try:
+        formatted_stock_code = format_stock_code(stock_code)
+        stock_info = get_stock_info(formatted_stock_code)
+        
+        # 如果输入的是原始代码（不带前缀），显示识别信息
+        if '.' not in stock_code:
+            print(f"📊 自动识别股票: {stock_code} -> {formatted_stock_code} ({stock_info['market']})")
+        
+        stock_code = formatted_stock_code
+        
+    except ValueError as e:
+        print(f"❌ 股票代码错误: {e}")
+        return None
     
     # 登录系统
     lg = bs.login()
@@ -190,28 +298,20 @@ def demo_usage():
     """
     print("=== 演示获取不同频率的K线数据 ===")
     
-    stock_code = 'sh.600873'
+    # 测试自动识别功能
+    test_codes = ['600873', 'sh.600873', '300787', '000001']
     
-    # 1. 获取日线数据
-    print("\n1. 获取日线数据（包含估值指标）:")
-    daily_data = get_k_data(stock_code, 60, "d", include_valuation=True)
-    if daily_data is not None:
-        print(f"字段: {list(daily_data.columns)}")
-        print(daily_data)
-    
-    # # 2. 获取5分钟线数据
-    # print("\n2. 获取5分钟线数据:")
-    # minute_data = get_k_data(stock_code, 1, "5")
-    # if minute_data is not None:
-    #     print(f"字段: {list(minute_data.columns)}")
-    #     print(minute_data.head(3))
-    
-    # # 3. 获取周线数据
-    # print("\n3. 获取周线数据:")
-    # weekly_data = get_k_data(stock_code, 5, "w")
-    # if weekly_data is not None:
-    #     print(f"字段: {list(weekly_data.columns)}")
-    #     print(weekly_data.head(3))
+    for stock_code in test_codes:
+        print(f"\n测试股票代码: {stock_code}")
+        
+        # 1. 获取日线数据
+        print("\n1. 获取日线数据（包含估值指标）:")
+        daily_data = get_k_data(stock_code, 5, "d", include_valuation=True)
+        if daily_data is not None:
+            print(f"字段: {list(daily_data.columns)}")
+            print(daily_data.head(2))
+        
+        break  # 只测试第一个代码
 
 
 if __name__ == "__main__":
